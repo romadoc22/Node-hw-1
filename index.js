@@ -1,51 +1,47 @@
-const { Command } = require('commander');
+const { Command } = require("commander");
+const {
+  listContacts,
+  getContactById,
+  removeContact,
+  addContact,
+} = require("./contacts");
 const program = new Command();
 program
-  .option('-a, --action <type>', 'choose action')
-  .option('-i, --id <type>', 'user id')
-  .option('-n, --name <type>', 'user name')
-  .option('-e, --email <type>', 'user email')
-  .option('-p, --phone <type>', 'user phone');
+  .option("-a, --action <type>", "choose action")
+  .option("-i, --id <type>", "user id")
+  .option("-n, --name <type>", "user name")
+  .option("-e, --email <type>", "user email")
+  .option("-p, --phone <type>", "user phone");
 
 program.parse(process.argv);
 
 const argv = program.opts();
 
 // TODO: рефакторити
-function invokeAction({ action, id, name, email, phone }) {
-  const contacts = require('./contacts'); // Імпорт функцій для роботи з контактами
+const invokeAction = async ({ action, id, name, email, phone }) => {
+  // Імпорт функцій для роботи з контактами
 
   switch (action) {
-    case 'list':
-      const allContacts = contacts.listContacts();
-      console.table(allContacts);
-      break;
+    case "list":
+      const allContacts = await listContacts();
+      return console.table(allContacts);
 
-    case 'get':
-      const contact = contacts.getContactById(id);
-      if (contact) {
-        console.log(contact);
-      } else {
-        console.log('Contact not found');
-      }
-      break;
+    case "get":
+      const contact = await getContactById(id);
 
-    case 'add':
-      const newContact = contacts.addContact(name, email, phone);
-      console.log('New contact added:', newContact);
-      break;
+      return console.log(contact);
 
-    case 'remove':
-      const removedContact = contacts.removeContact(id);
-      if (removedContact) {
-        console.log('Contact removed:', removedContact);
-      } else {
-        console.log('Contact not found');
-      }
-      break;
+    case "add":
+      const newContact = await addContact(name, email, phone);
+      return console.log("New contact added:", newContact);
+
+    case "remove":
+      const removedContact = await removeContact(id);
+
+      return console.log("Contact removed:", removedContact);
 
     default:
-      console.warn('\x1B[31m Unknown action type!');
+      console.warn("\x1B[31m Unknown action type!");
   }
 }
 
